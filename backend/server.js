@@ -179,6 +179,22 @@ async function connectDB() {
 connectDB();
 
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+// Handle server startup with error handling
+server.listen(PORT, '0.0.0.0', (error) => {
+  if (error) {
+    console.error('❌ Server failed to start:', error);
+    process.exit(1);
+  }
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log('🌐 Server ready to accept connections');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('✅ Server closed');
+    process.exit(0);
+  });
 });

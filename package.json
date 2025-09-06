@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
     "start": "node backend/server.js",
+    "start:simple": "node server-simple.js",
     "postbuild": "cp -r frontend/build backend/ || xcopy frontend\\build backend\\build /E /I /Y",
     "dev": "concurrently \"cd backend && npm run dev-sqlite\" \"cd frontend && npm start\"",
     "install-deps": "cd backend && npm install && cd ../frontend && npm install"
