@@ -4,8 +4,9 @@
   "description": "Full-stack WhatsApp Clone with React and Node.js",
   "main": "backend/server.js",
   "scripts": {
-    "start": "cd backend && npm start",
-    "build": "cd frontend && npm run build && mkdir -p ../backend/public && cp -r build/* ../backend/public/",
+    "build": "npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend",
+    "start": "node backend/server.js",
+    "postbuild": "cp -r frontend/build backend/ || xcopy frontend\\build backend\\build /E /I /Y",
     "dev": "concurrently \"cd backend && npm run dev-sqlite\" \"cd frontend && npm start\"",
     "install-deps": "cd backend && npm install && cd ../frontend && npm install"
   },
