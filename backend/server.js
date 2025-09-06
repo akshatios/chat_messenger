@@ -9,6 +9,17 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+// Force production settings
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+}
+
+console.log('🚀 Starting server in', process.env.NODE_ENV, 'mode');
+console.log('🔧 Environment variables check:');
+console.log('- PORT:', process.env.PORT || 'NOT SET');
+console.log('- MONGODB_URI:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
+console.log('- JWT_SECRET:', process.env.JWT_SECRET ? 'SET' : 'NOT SET');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -32,10 +43,11 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// Debug middleware to log all requests
+// Simple request logging for production
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  console.log('Headers:', req.headers);
+  if (req.path.startsWith('/api/')) {
+    console.log(`API: ${req.method} ${req.path}`);
+  }
   next();
 });
 

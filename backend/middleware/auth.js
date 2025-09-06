@@ -3,16 +3,9 @@ const User = require('../models/User');
 
 const auth = async (req, res, next) => {
   try {
-    console.log('=== AUTH MIDDLEWARE DEBUG ===');
-    console.log('Authorization header:', req.header('Authorization'));
-    console.log('All headers:', Object.keys(req.headers));
-    
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
-    console.log('Extracted token:', token ? `${token.substring(0, 10)}...` : 'NO TOKEN');
-    
     if (!token) {
-      console.log('No token found, denying access');
       return res.status(401).json({ message: 'No token, authorization denied' });
     }
 

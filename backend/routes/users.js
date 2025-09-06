@@ -48,20 +48,13 @@ router.get('/debug/all', auth, async (req, res) => {
 // Search users by username or email
 router.get('/search', auth, async (req, res) => {
   try {
-    console.log('=== USER SEARCH DEBUG ===');
-    console.log('Request query params:', req.query);
-    console.log('Current user:', req.user ? req.user._id : 'No user');
-    
     const { query } = req.query;
     
     if (!query || query.length < 2) {
-      console.log('Query too short:', query);
       return res.status(400).json({ message: 'Search query must be at least 2 characters' });
     }
 
-    console.log('Searching for users with query:', query);
-    
-    const searchCriteria = {
+    const users = await User.find({
       $and: [
         { _id: { $ne: req.user._id } }, // Exclude current user
         {
@@ -71,16 +64,11 @@ router.get('/search', auth, async (req, res) => {
           ]
         }
       ]
-    };
-    
-    console.log('Search criteria:', JSON.stringify(searchCriteria, null, 2));
-    
-    const users = await User.find(searchCriteria)
-      .select('username email avatar status isOnline lastSeen')
-      .limit(20);
+    })
+    .select('username email avatar status isOnline lastSeen')
+    .limit(20);
 
-    console.log('Found users:', users.length, users.map(u => ({ username: u.username, email: u.email })));
-    
+    console.log(`Found ${users.length} users for query: ${query}`);
     res.json({ users });
   } catch (error) {
     console.error('Search users error:', error);
