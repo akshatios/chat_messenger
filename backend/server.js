@@ -152,10 +152,31 @@ io.on('connection', (socket) => {
   });
 });
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/whatsapp-clone')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// MongoDB connection with multiple fallbacks
+const mongoUrls = [
+  process.env.MONGODB_URI,
+  'mongodb+srv://demo:demo123@cluster0.mongodb.net/whatsapp-clone?retryWrites=true&w=majority',
+  'mongodb+srv://test:test123@cluster0.mongodb.net/whatsapp?retryWrites=true&w=majority',
+  'mongodb://localhost:27017/whatsapp-clone'
+];
+
+async function connectDB() {
+  for (const url of mongoUrls) {
+    if (!url) continue;
+    try {
+      console.log('🔗 Attempting MongoDB connection...');
+      await mongoose.connect(url);
+      console.log('✅ Connected to MongoDB successfully!');
+      return;
+    } catch (error) {
+      console.log('❌ MongoDB connection failed:', error.message);
+      continue;
+    }
+  }
+  console.log('💥 All MongoDB connections failed!');
+}
+
+connectDB();
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
