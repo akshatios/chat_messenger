@@ -4,6 +4,24 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
+// Public debug endpoint (no auth required)
+router.get('/debug/public', async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    console.log('Public debug - Total users:', userCount);
+    
+    res.json({ 
+      message: 'API is working!',
+      totalUsers: userCount,
+      timestamp: new Date().toISOString(),
+      mongodb: require('mongoose').connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+  } catch (error) {
+    console.error('Public debug error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Debug route to list all users (temporary)
 router.get('/debug/all', auth, async (req, res) => {
   try {
