@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "node railway-server.js",
+    "startCommand": "node backend/server-railway.js",
     "restartPolicyType": "ON_FAILURE",
     "sleepApplication": false
   }
