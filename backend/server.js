@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -31,15 +32,12 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// Health check endpoint
-app.get('/', (req, res) => {
-  res.json({ 
-    status: 'WhatsApp Clone API is running!',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
+// API Routes first
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/messages', require('./routes/messages'));
+app.use('/api/users', require('./routes/users'));
 
+// Health check endpoints
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
@@ -48,10 +46,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/messages', require('./routes/messages'));
-app.use('/api/users', require('./routes/users'));
+// Serve static files from React build
+app.use(express.static('build'));
+
+// Handle React Router (return `index.html` for all non-API routes)
+// This should be last to catch all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 // Socket.io connection handling
 const connectedUsers = new Map();
