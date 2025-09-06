@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ["https://whatsapp-clone-production-8a71.up.railway.app"] 
+      ? ["https://chatmessenger-production.up.railway.app"] 
       : ["http://localhost:3000"],
     methods: ["GET", "POST"]
   }
@@ -22,7 +22,7 @@ const io = socketIo(server, {
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? "https://whatsapp-clone-production-8a71.up.railway.app"
+    ? "https://chatmessenger-production.up.railway.app"
     : "http://localhost:3000",
   credentials: true
 }));
