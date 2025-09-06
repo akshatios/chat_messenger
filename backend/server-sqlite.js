@@ -785,6 +785,13 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Ensure uploads directory exists
+const fs = require('fs');
+if (!fs.existsSync('uploads')) {
+  fs.mkdirSync('uploads', { recursive: true });
+  console.log('Created uploads directory');
+}
+
 // Initialize database and start server
 const initializeDatabase = async () => {
   try {
