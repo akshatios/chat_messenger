@@ -13,16 +13,16 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ["https://chatmessenger-production.up.railway.app", "https://whatsappclone-production-8a71.up.railway.app"] 
+      ? true  // Allow all origins temporarily for debugging
       : ["http://localhost:3000"],
     methods: ["GET", "POST"]
   }
 });
 
-// Middleware
+// Middleware - Temporary permissive CORS for debugging
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? ["https://chatmessenger-production.up.railway.app", "https://whatsappclone-production-8a71.up.railway.app"]
+    ? true  // Allow all origins temporarily for debugging
     : ["http://localhost:3000", "http://localhost:3001"],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
