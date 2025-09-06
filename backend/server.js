@@ -12,15 +12,39 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.NODE_ENV === 'production' 
+      ? ["https://whatsapp-clone-production-8a71.up.railway.app"] 
+      : ["http://localhost:3000"],
     methods: ["GET", "POST"]
   }
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? "https://whatsapp-clone-production-8a71.up.railway.app"
+    : "http://localhost:3000",
+  credentials: true
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'WhatsApp Clone API is running!',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -107,7 +131,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/whatsapp-
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
