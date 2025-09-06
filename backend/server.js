@@ -32,10 +32,31 @@ app.use(cors({
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log('Headers:', req.headers);
+  next();
+});
+
 // API Routes first
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/users', require('./routes/users'));
+
+// Debug: List all registered routes
+console.log('Registered routes:');
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    console.log(`${middleware.route.stack[0].method.toUpperCase()} ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    middleware.handle.stack.forEach((handler) => {
+      if (handler.route) {
+        console.log(`${handler.route.stack[0].method.toUpperCase()} ${middleware.regexp} ${handler.route.path}`);
+      }
+    });
+  }
+});
 
 // Health check endpoints
 app.get('/health', (req, res) => {

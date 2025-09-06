@@ -4,16 +4,46 @@ const auth = require('../middleware/auth');
 
 const router = express.Router();
 
+// Debug route to list all users (temporary)
+router.get('/debug/all', auth, async (req, res) => {
+  try {
+    const allUsers = await User.find({})
+      .select('username email avatar status isOnline lastSeen')
+      .limit(50);
+    
+    console.log('All users in database:', allUsers.length);
+    allUsers.forEach(user => {
+      console.log(`- ${user.username} (${user.email}) - ID: ${user._id}`);
+    });
+    
+    res.json({ 
+      totalUsers: allUsers.length,
+      users: allUsers,
+      currentUser: req.user ? req.user._id : 'No user'
+    });
+  } catch (error) {
+    console.error('Debug all users error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Search users by username or email
 router.get('/search', auth, async (req, res) => {
   try {
+    console.log('=== USER SEARCH DEBUG ===');
+    console.log('Request query params:', req.query);
+    console.log('Current user:', req.user ? req.user._id : 'No user');
+    
     const { query } = req.query;
     
     if (!query || query.length < 2) {
+      console.log('Query too short:', query);
       return res.status(400).json({ message: 'Search query must be at least 2 characters' });
     }
 
-    const users = await User.find({
+    console.log('Searching for users with query:', query);
+    
+    const searchCriteria = {
       $and: [
         { _id: { $ne: req.user._id } }, // Exclude current user
         {
@@ -23,14 +53,20 @@ router.get('/search', auth, async (req, res) => {
           ]
         }
       ]
-    })
-    .select('username email avatar status isOnline lastSeen')
-    .limit(20);
+    };
+    
+    console.log('Search criteria:', JSON.stringify(searchCriteria, null, 2));
+    
+    const users = await User.find(searchCriteria)
+      .select('username email avatar status isOnline lastSeen')
+      .limit(20);
 
+    console.log('Found users:', users.length, users.map(u => ({ username: u.username, email: u.email })));
+    
     res.json({ users });
   } catch (error) {
     console.error('Search users error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
