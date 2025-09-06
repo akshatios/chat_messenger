@@ -15,9 +15,14 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+// CORS configuration for production
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? [process.env.FRONTEND_URL, process.env.RAILWAY_STATIC_URL].filter(Boolean)
+  : ["http://localhost:3000"];
+
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     methods: ["GET", "POST"]
   }
 });
@@ -118,6 +123,11 @@ Message.belongsTo(User, { as: 'Recipient', foreignKey: 'recipientId' });
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
+
+// Serve static files from React build in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
 // Auth middleware
 const authMiddleware = async (req, res, next) => {
@@ -767,6 +777,13 @@ socket.on('sendMessage', async (messageData) => {
     }
   });
 });
+
+// Catch-all route for React Router in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+}
 
 // Initialize database and start server
 const initializeDatabase = async () => {
