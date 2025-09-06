@@ -51,35 +51,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Routes first
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/messages', require('./routes/messages'));
-app.use('/api/users', require('./routes/users'));
-
-// Debug: List all registered routes
-console.log('Registered routes:');
-app._router.stack.forEach((middleware) => {
-  if (middleware.route) {
-    console.log(`${middleware.route.stack[0].method.toUpperCase()} ${middleware.route.path}`);
-  } else if (middleware.name === 'router') {
-    middleware.handle.stack.forEach((handler) => {
-      if (handler.route) {
-        console.log(`${handler.route.stack[0].method.toUpperCase()} ${middleware.regexp} ${handler.route.path}`);
-      }
-    });
-  }
-});
-
-// Health check endpoints
+// Health check endpoints - MUST be before static files
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV
   });
 });
 
-// Serve static files from React build
+// API Routes - MUST be before static files
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/messages', require('./routes/messages'));
+app.use('/api/users', require('./routes/users'));
+
+console.log('✅ API routes registered');
+
+// Serve static files from React build - MUST be after API routes
 app.use(express.static('build'));
 
 // Handle React Router (return `index.html` for all non-API routes)

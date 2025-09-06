@@ -2,7 +2,7 @@
   "name": "whatsapp-clone-fullstack",
   "version": "1.0.0",
   "description": "Full-stack WhatsApp Clone with React and Node.js",
-  "main": "backend/server-sqlite.js",
+  "main": "backend/server.js",
   "scripts": {
     "start": "cd backend && npm start",
     "build": "cd frontend && npm run build && mkdir -p ../backend/public && cp -r build/* ../backend/public/",
