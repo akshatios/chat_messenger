@@ -1,9 +1,13 @@
-// ROOT LEVEL SERVER FOR RAILWAY (GUARANTEED PATH)
-console.log('🚀 Starting ROOT server for Railway...');
+// ROOT LEVEL SERVER FOR RAILWAY (GUARANTEED PATH - NO MONGODB)
+console.log('🚀 Starting ROOT server for Railway WITHOUT MongoDB...');
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+
+// In-memory user storage (temporary)
+const users = new Map();
+const sessions = new Map();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
