@@ -3,7 +3,7 @@ import { Message } from '../types';
 
 class SocketService {
   private socket: Socket | null = null;
-  private readonly SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+  private readonly SOCKET_URL = process.env.REACT_APP_SOCKET_URL || (process.env.NODE_ENV === 'production' ? window.location.origin : 'http://localhost:5000');
 
   connect(userId: string): void {
     this.socket = io(this.SOCKET_URL);

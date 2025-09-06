@@ -42,6 +42,7 @@ router.post('/register', async (req, res) => {
       message: 'User registered successfully',
       token,
       user: {
+        _id: user._id,
         id: user._id,
         username: user.username,
         email: user.email,
@@ -88,6 +89,7 @@ router.post('/login', async (req, res) => {
       message: 'Login successful',
       token,
       user: {
+        _id: user._id,
         id: user._id,
         username: user.username,
         email: user.email,
