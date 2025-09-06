@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ["https://chatmessenger-production.up.railway.app"] 
+      ? ["https://chatmessenger-production.up.railway.app", "https://whatsappclone-production-8a71.up.railway.app"] 
       : ["http://localhost:3000"],
     methods: ["GET", "POST"]
   }
@@ -22,9 +22,11 @@ const io = socketIo(server, {
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? "https://chatmessenger-production.up.railway.app"
-    : "http://localhost:3000",
-  credentials: true
+    ? ["https://chatmessenger-production.up.railway.app", "https://whatsappclone-production-8a71.up.railway.app"]
+    : ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
